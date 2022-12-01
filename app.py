@@ -1,9 +1,13 @@
 from flask import Flask, request, redirect, jsonify, json
-from jiosaavn.Sync import searchSong
 import os
 import time
-from jiosaavn.Sync import song
 from flask_cors import CORS
+
+from JioSaavn import Async
+from JioSaavn import Sync
+
+asyncJioSaavn = Async.JioSaavn()
+syncJioSaavn = Sync.JioSaavn()
 
 app = Flask(__name__)
 CORS(app)
@@ -13,13 +17,13 @@ def search():
     dataArray = []
     query = request.args.get('query')
     if query:
-        search = searchSong(query)
+        search = syncJioSaavn.searchSong(query)
         searchLength = len(search)
         if searchLength > 0:
             if searchLength > 6:
                 searchLength = 6
             for i in range(searchLength):
-                songData = song(id=search[i]["id"])
+                songData = syncJioSaavn.song(id=search[i]["id"])
                 songLink = songData['audioUrls']["320_KBPS"]
                 songName = songData['songName']
                 songBanner = songData['imagesUrls']['500x500']
